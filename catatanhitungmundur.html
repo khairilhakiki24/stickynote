@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catatan Bumil - Sticky Notes</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h2>Catatan Ibu Hamil - Sticky Notes</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <!-- Input untuk menambahkan catatan -->
+        <div class="form-group">
+          <textarea id="newNote" class="form-control" placeholder="Tambahkan catatan baru..."></textarea>
+        </div>
+        <div class="form-group">
+          <input type="datetime-local" id="noteDateTime" class="form-control" />
+        </div>
+        <button class="btn btn-primary" onclick="addNote()">Tambah Catatan</button>
+      </div>
+    </div>
+    <div class="row mt-3" id="notesContainer">
+      <!-- Container untuk menampilkan catatan -->
+    </div>
+  </div>
+
+  <!-- JavaScript dan jQuery (wajib diletakkan sebelum penutup </body>) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    // Fungsi untuk menambahkan catatan
+    function addNote() {
+      const newNoteText = document.getElementById("newNote").value;
+      const newNoteDateTime = document.getElementById("noteDateTime").value;
+      if (newNoteText.trim() !== '' && newNoteDateTime.trim() !== '') {
+        const noteObj = { text: newNoteText, datetime: newNoteDateTime };
+        notes.push(noteObj);
+        saveNotesToStorage();
+        updateNotesUI();
+        document.getElementById("newNote").value = '';
+        document.getElementById("noteDateTime").value = '';
+        startCountdown(newNoteDateTime); // Panggil fungsi untuk memulai hitung mundur dan notifikasi
+      }
+    }
+
+    // Fungsi untuk memperbarui tampilan catatan
+    function updateNotesUI() {
+      const notesContainer = document.getElementById("notesContainer");
+      notesContainer.innerHTML = '';
+
+      for (let i = 0; i < notes.length; i++) {
+        const note = notes[i];
+        const noteCard = document.createElement("div");
+        noteCard.className = "card m-2";
+        noteCard.innerHTML = `
+          <div class="card-body">
+            <p class="card-text">${note.text}</p>
+            <p class="card-text">Waktu dan Tanggal: ${note.datetime}</p>
+            <button class="btn btn-danger" onclick="deleteNote(${i})">Hapus</button>
+          </div>
+        `;
+        notesContainer.appendChild(noteCard);
+      }
+    }
+
+    // Fungsi untuk menghapus catatan
+    function deleteNote(index) {
+      notes.splice(index, 1);
+      saveNotesToStorage();
+      updateNotesUI();
+    }
+
+    // Fungsi untuk menyimpan catatan ke local storage
+    function saveNotesToStorage() {
+      localStorage.setItem("notes", JSON.stringify(notes));
+    }
+
+    // Fungsi untuk memuat catatan dari local storage saat halaman dimuat
+    function loadNotesFromStorage() {
+      const storedNotes = localStorage.getItem("notes");
+      if (storedNotes) {
+        notes = JSON.parse(storedNotes);
+      }
+    }
+
+    // Fungsi untuk memulai hitung mundur dan menampilkan notifikasi saat waktu catatan selesai
+    function startCountdown(datetimeString) {
+      const targetDate = new Date(datetimeString).getTime();
+      const interval = setInterval(function () {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+        if (distance < 0) {
+          clearInterval(interval);
+          showNotification();
+        }
+      }, 1000);
+    }
+
+    // Fungsi untuk menampilkan notifikasi JavaScript saat waktu catatan selesai
+    function showNotification() {
+      const notificationTitle = "Waktu Catatan Telah Selesai!";
+      const notificationOptions = {
+        body: "Catatan yang telah Anda atur waktu dan tanggalnya telah mencapai target.",
+        icon: "https://example.com/notification-icon.png", // Ganti dengan URL ikon notifikasi Anda
+      };
+
+      if ('Notification' in window && Notification.permission === "granted") {
+        new Notification(notificationTitle, notificationOptions);
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            new Notification(notificationTitle, notificationOptions);
+          }
+        });
+      }
+    }
+
+    // Panggil fungsi updateNotesUI dan loadNotesFromStorage saat halaman pertama kali dimuat
+    let notes = [];
+    loadNotesFromStorage();
+    updateNotesUI();
+  </script>
+</body>
+</html>
