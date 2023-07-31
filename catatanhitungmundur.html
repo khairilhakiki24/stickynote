@@ -6,6 +6,8 @@
   <title>Catatan Bumil - Sticky Notes</title>
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- SweetAlert CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
 </head>
 <body>
   <div class="container mt-5">
@@ -30,6 +32,8 @@
   <!-- JavaScript dan jQuery (wajib diletakkan sebelum penutup </body>) -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- SweetAlert -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
   <script>
     // Fungsi untuk menambahkan catatan
     function addNote() {
@@ -96,7 +100,7 @@
         const distance = targetDate - now;
         if (distance < 0) {
           clearInterval(interval);
-          showNotification(noteText); // Panggil fungsi untuk menampilkan notifikasi dengan isi catatan yang sesuai
+          showNotification(noteText); // Panggil fungsi untuk menampilkan pop-up notifikasi dengan isi catatan yang sesuai
         }
       }, 1000);
     }
@@ -117,23 +121,13 @@
       }, 1000);
     }
 
-    // Fungsi untuk menampilkan notifikasi JavaScript saat waktu catatan selesai
+    // Fungsi untuk menampilkan pop-up notifikasi saat waktu catatan selesai
     function showNotification(noteText) {
-      const notificationTitle = "Waktu Catatan Telah Selesai!";
-      const notificationOptions = {
-        body: `Catatan: ${noteText}`,
-        icon: "https://example.com/notification-icon.png", // Ganti dengan URL ikon notifikasi Anda
-      };
-
-      if ('Notification' in window && Notification.permission === "granted") {
-        new Notification(notificationTitle, notificationOptions);
-      } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(permission => {
-          if (permission === "granted") {
-            new Notification(notificationTitle, notificationOptions);
-          }
-        });
-      }
+      swal({
+        title: "Waktu Catatan Telah Selesai!",
+        text: `Catatan: ${noteText}`,
+        icon: "success",
+      });
     }
 
     // Panggil fungsi updateNotesUI dan loadNotesFromStorage saat halaman pertama kali dimuat
