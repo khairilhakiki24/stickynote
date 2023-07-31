@@ -42,7 +42,7 @@
         updateNotesUI();
         document.getElementById("newNote").value = '';
         document.getElementById("noteDateTime").value = '';
-        startCountdown(newNoteDateTime); // Panggil fungsi untuk memulai hitung mundur dan notifikasi
+        startCountdown(newNoteDateTime, newNoteText); // Panggil fungsi untuk memulai hitung mundur dan notifikasi
       }
     }
 
@@ -87,23 +87,23 @@
     }
 
     // Fungsi untuk memulai hitung mundur dan menampilkan notifikasi saat waktu catatan selesai
-    function startCountdown(datetimeString) {
+    function startCountdown(datetimeString, noteText) {
       const targetDate = new Date(datetimeString).getTime();
       const interval = setInterval(function () {
         const now = new Date().getTime();
         const distance = targetDate - now;
         if (distance < 0) {
           clearInterval(interval);
-          showNotification();
+          showNotification(noteText); // Panggil fungsi untuk menampilkan notifikasi dengan isi catatan yang sesuai
         }
       }, 1000);
     }
 
     // Fungsi untuk menampilkan notifikasi JavaScript saat waktu catatan selesai
-    function showNotification() {
+    function showNotification(noteText) {
       const notificationTitle = "Waktu Catatan Telah Selesai!";
       const notificationOptions = {
-        body: "Catatan yang telah Anda atur waktu dan tanggalnya telah mencapai target.",
+        body: `Catatan: ${noteText}`,
         icon: "https://example.com/notification-icon.png", // Ganti dengan URL ikon notifikasi Anda
       };
 
